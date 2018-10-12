@@ -28,8 +28,8 @@ client.on('ready', () => {
   });
 
 
-
 client.on('message', message => {
+    if(!message.channel.guild) return;
     let prefix = "-";
     if(message.content.startsWith(prefix + 'new')) {
         let args = message.content.split(' ').slice(1).join(' ');
@@ -39,6 +39,7 @@ client.on('message', message => {
         }
         if(args) {
             message.guild.createChannel(`ticket-${message.author.username}`, 'text').then(ticket => {
+                if(message.guild.channels.exists("name", `ticket-`)) message.channel.send(`**لقد قمد بفتج تيكت مسبقآ .. [ ${ticket} ]**`)
                 ticket.setParent(message.guild.channels.find(a => a.name === 'TICKETS'));
                     let embed = new Discord.RichEmbed()
                         .setTitle('New Ticket.')
@@ -77,27 +78,33 @@ client.on('message', message => {
 
 
 client.on('message', message => {
+    if(!message.channel.guild) return;
+    if(!message.channel.name.startsWith('ticket-')) return;
     let prefix = '-';
-    if (message.content.startsWith(prefix + "close")) {
-        if (!message.channel.name.startsWith(`ticket-`)) return message.channel.send(`لا يمكنك استخدام أمر الإغلاق خارج التذاكر.`)
-       message.channel.send(`هل أنت متأكد؟ بمجرد تأكيد ، لا يمكنك عكس هذا الإجراء! \ للتأكيد ، اكتب \ "-close \`. سوف ينتهي المهلة خلال 20 ثوانٍ ويتم إلغاؤها.`)
-           .then((m) => {
-               message.channel.awaitMessages(response => response.content === '-close', {
-                       max: 1,
-                       time: 20000,
-                       errors: ['time'],
-                   .then((collected) => {
-                       message.channel.delete();
-                   .catch(() => {
-                       m.edit('انتهى إغلاق التذاكر ، لم يتم إغلاق التذكرة.').then(m2 => {
-                           m2.delete();
-                       }, 3000);
-                   });
-           });
-   }
- 
-});
+    if(message.content.startsWith(prefix + 'close')) {
+        if(!message.member.hasPermissions("MANAGE_CHANNELS")) {
+            let embed = new Discord.RichEmbed()
+                .addField("You must have **MANAGE_CHANNELS** permission.")
+                .setColor("#FFD700")
+                .setFooter("United.");
+                
+                ticket.sendEmbed(embed);
 
+                
+        } else {
+            let cc = new Discord.RichEmbed()
+                .addField("**Closing the current ticket.. :robot:**")
+                .setColor("#FFD700")
+                .setFooter("United.");
+
+                message.channel.sendEmbed(cc) .then(
+                    message.channel.delete()    
+                )
+                    
+                
+        }
+    }
+});
 
 
 
