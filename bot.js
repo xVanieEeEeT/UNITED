@@ -38,7 +38,7 @@ client.on('message', message => {
             return message.channel.send('**يرجى وجود رتبة `Support Team`**');
         }
         if(args) {
-            message.guild.createChannel(`ticket-${message.author.username}`, 'text').then(ticket => {
+            message.guild.createChannel(`ticket-${args}`, 'text').then(ticket => {
                 ticket.setParent(message.guild.channels.find(a => a.name === 'TICKETS'));
                     let embed = new Discord.RichEmbed()
                         .setTitle('New Ticket.')
