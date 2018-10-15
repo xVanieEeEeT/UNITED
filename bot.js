@@ -28,84 +28,84 @@ client.on('ready', () => {
   });
 
 
+
 client.on('message', message => {
-    if(!message.channel.guild) return;
-    let prefix = "-";
     if(message.content.startsWith(prefix + 'new')) {
         let args = message.content.split(' ').slice(1).join(' ');
-        var support = message.guild.roles.find("name", "Support Team");
-        if(!support) {
-            return message.channel.send('**يرجى وجود رتبة `Support Team`**');
-        }
-        if(args) {
-            message.guild.createChannel(`ticket-${message.author.username}`, 'text').then(ticket => {
-                if(message.guild.channels.exists("name", `ticket-`)) message.channel.send(`**لقد قمد بفتج تيكت مسبقآ .. [ ${ticket} ]**`)
-                ticket.setParent(message.guild.channels.find(a => a.name === 'TICKETS'));
+        let support = message.guild.roles.find("name","Support Team");
+        let ticketsStation = message.guild.channels.find("name", "TICKETS");
+        if(!args) {
+            return message.channel.send('**Please type a subject for the ticket. :x:**');
+        };
+                if(!support) {
+                    return message.channel.send('**Please make sure that `Support Team` role exists and it\'s not duplicated.**');
+                };
+            if(!ticketsStation) {
+                message.guild.createChannel("TICKETS", "category");
+            };
+                message.guild.createChannel(`ticket-${message.author.username}`, "text").then(ticket => {
+                    message.delete()
+                        message.channel.send(`**Your ticket has been created. :white_check_mark: [ ${ticket} ]**`);
+                    ticket.setParent(ticketsStation);
+                    ticketsStation.setPosition(1);
+                        ticket.overwritePermissions(message.guild.id, {
+                            SEND_MESSAGES: false,
+                            READ_MESSAGES: false
+                        });
+                            ticket.overwritePermissions(support.id, {
+                                SEND_MESSAGES: true,
+                                READ_MESSAGES: true
+                            });
+                                ticket.overwritePermissions(message.author.id, {
+                                    SEND_MESSAGES: true,
+                                    READ_MESSAGES: true
+                                });
                     let embed = new Discord.RichEmbed()
-                        .setTitle('New Ticket.')
-                        .addField('Subject:', `${args}`)
-                        .addField('Author:', `<@${message.author.id}>`)
-                        .addField('Channel:', `${message.channel.name}`)
-                        .setColor('#FFD700')
-                        .setFooter('United.');
+                                .setTitle('**New Ticket.**')
+                                .setColor("RANDOM")
+                                .setThumbnail(`${message.author.avatarURL}`)
+                                .addField('Subject', args)
+                                .addField('Author', message.author)
+                                .addField('Channel', `<#${message.channel.id}>`);
 
-                        ticket.sendEmbed(embed) .then(
-                            message.channel.send(`**Your ticket has been successfully created. :white_check_mark: [ ${ticket} ]**`) .then(
-                                ticket.overwritePermissions(message.guild.id, {
-                                    READ_MESSAGES: false
-                                }) .then(ticket.overwritePermissions(message.author.id, {
-                                    SEND_MESSAGES: true,
-                                    READ_MESSAGES: true
-                                })) .then(ticket.overwritePermissions(support.id, {
-                                    SEND_MESSAGES: true,
-                                    READ_MESSAGES: true
-                                }))
-                            
-
-                            )
-                        )
-
-
-                        
-            })
-
-        } else {
-            return message.channel.send('**.يرجى وضع عنوان للتيكت قبل فتحه :ok_hand: **');
-        }
-
+                                ticket.sendEmbed(embed);
+                }) .catch();
     }
-});
-
-
-client.on('message', message => {
-    if(!message.channel.guild) return;
-    if(!message.channel.name.startsWith('ticket-')) return;
-    let prefix = '-';
     if(message.content.startsWith(prefix + 'close')) {
-        if(!message.member.hasPermissions("MANAGE_CHANNELS")) {
-            let embed = new Discord.RichEmbed()
-                .addField("You must have **MANAGE_CHANNELS** permission.")
-                .setColor("#FFD700")
-                .setFooter("United.");
-                
-                ticket.sendEmbed(embed);
+            if(!message.member.hasPermission("ADMINISTRATOR")) return;
+        if(!message.channel.name.startsWith("ticket")) {
+            return;
+        };  
+                let embed = new Discord.RichEmbed()
+                    .setAuthor("Do you really want to close this ticket? Repeat the command to make sure. You have 20 seconds.")
+                    .setColor("RANDOM");
+                    message.channel.sendEmbed(embed) .then(codes => {
 
-                
-        } else {
-            let cc = new Discord.RichEmbed()
-                .addField("**Closing the current ticket.. :robot:**")
-                .setColor("#FFD700")
-                .setFooter("United.");
-
-                message.channel.sendEmbed(cc) .then(
-                    message.channel.delete()    
-                )
                     
-                
-        }
+                        const filter = msg => msg.content.startsWith(prefix + 'close');
+                        message.channel.awaitMessages(response => response.content === prefix + 'close', {
+                            max: 1,
+                            time: 20000,
+                            errors: ['time']
+                        })
+                        .then((collect) => {
+                            message.channel.delete();
+                        }) .catch(() => {
+                            codes.delete()
+                                .then(message.channel.send('**Operation has been cancelled.**')) .then((c) => {
+                                    c.delete(4000);
+                                })
+                                    
+                            
+                        })
+
+
+                    })
+
+
+            
     }
 });
-
 
 
 client.login(process.env.BOT_TOKEN);
