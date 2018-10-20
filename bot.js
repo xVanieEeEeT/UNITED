@@ -28,7 +28,6 @@ client.on('ready', () => {
   });
 
 const moment = require("moment")
-const moment = require("moment")
 client.on("guildMemberAdd", m => {
         let room = m.guild.channels.find(a => a.name === 'united');
     if (datediff(parseDate(moment(m.user.createdTimestamp).format('l')), parseDate(moment().format('l'))) < 8) {
