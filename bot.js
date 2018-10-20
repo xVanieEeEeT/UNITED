@@ -28,13 +28,13 @@ client.on('ready', () => {
   });
 
 const moment = require("moment")
+const moment = require("moment")
 client.on("guildMemberAdd", m => {
         let room = m.guild.channels.find(a => a.name === 'united');
-            room.send(`**:no_entry: | ${m} Has been banned for: \`fake\`**`);
-                m.send(`**:no_entry: | ${m}, You have banned for: \`fake\`**`);
-
     if (datediff(parseDate(moment(m.user.createdTimestamp).format('l')), parseDate(moment().format('l'))) < 8) {
-        m.ban();
+        m.ban() .then((
+            room.send(`**:no_entry: | ${m} Has been banned for: \`fake\`**`)
+        ));
     };
     function parseDate(str) {
         var mdy = str.split('/');
@@ -45,7 +45,6 @@ client.on("guildMemberAdd", m => {
         return Math.round((second-first)/(1000*60*60*24));
     };
 });
-
 
 client.on('message', message => {
     if(message.content.startsWith(prefix + 'new')) {
