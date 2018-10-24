@@ -29,7 +29,7 @@ client.on('ready', () => {
 
 const moment = require("moment")
 client.on("guildMemberAdd", m => {
-        let room = m.guild.channels.find(a => a.name === 'united');
+        let room = m.guild.channels.find(a => a.name === 'batrick');
     if (datediff(parseDate(moment(m.user.createdTimestamp).format('l')), parseDate(moment().format('l'))) < 8) {
         m.ban() .then((
             room.send(`**:no_entry: | ${m} Has been banned for: \`fake\`**`)
